@@ -1,0 +1,3 @@
+A Quora-like QnA platform, open-source, simplistic. 
+
+Built using Ruby on Rails.

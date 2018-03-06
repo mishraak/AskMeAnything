@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+
+
+
+
+<main>
+
+	<div id ="leftMain" >
+
+	<% if User.amIAdmin current_user.id %>
+	Make admins and moderators
+	<br>
+	<br>
+
+
+
+
+	<h3> Members </h3>
+	<% @users.member.each do |member| %>
+	<br>
+
+	<%= member.email %>
+	<%= link_to 'Make admin', url_for(controller: 'home', action: 'makeadmin', :member_id => member.id), method: :post %>
+	<% end %>
+
+
+	<br>
+	<br>
+
+
+
+
+	<h3> Moderators </h3>
+	<% @users.moderator.each do |moderator| %>
+	<br>
+	<%= moderator.email %>
+	<%= link_to 'Make admin', url_for(controller: 'home', action: 'makeadmin', :member_id => moderator.id), method: :post %>
+
+	<% end %>
+
+
+     <br>
+	<br>
+
+
+
+
+	<h3> Admin </h3>
+	<% @users.admin.each do |admin|  %>
+	<br>
+	<% if admin.email == "admin@gmail.com" %>
+	<% next %>
+	<% end %>
+	<%= admin.email %>
+		<%= link_to 'Disable admin powers ', url_for(controller: 'home', action: 'disableadmin', :admin_id => admin.id), method: :post %>
+
+	<% end %>
+
+
+
+
+
+	<% end %>
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<div id="middleMain">
+
+
+<div class ="createQuestion">
+	<%= form_for @question, remote: true do |f| %>
+
+<br>
+<%= f.text_area :content %>  <br>
+
+
+<%= f.label "Ask anonymous" %> 
+<%= f.check_box :anonymous, {}, true, false %> 
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<%= f.submit  %>
+
+<% end %>
+</div>
+
+
+<%  @questions.each do |question| 
+	%>
+
+
+
+
+
+
+
+<div class ="question">
+
+
+<!-- picture ka kaam
+ -->
+ <div class="left">
+<div class="userImage">
+			
+<% if question.User.profile_picture  && !question.anonymous %>
+	<img src="/uploads/<%=question.User.profile_picture %>">
+	<% else %>
+
+<% end %>
+
+
+		</div>
+	</div>
+
+
+
+
+<% if question.anonymous %>
+Anonymous 
+<% else %>
+<%= question.User.email %>
+<% end %>
+
+asked
+  
+<%= question.content %>
+<%= link_to question.upVoted_string(current_user.id), url_for(controller: 'upvote_questions', action: 'toggle_upvote', question_id: question.id),id: "upvoteQuestion_#{question.id}", method: :post ,:remote => true%>
+
+
+
+
+<% if question.can_modify question.User.id, current_user.id %>
+        <%= link_to 'Edit', edit_question_path(question) %>
+<% end %>
+
+
+<% if question.can_modify question.User.id, current_user.id %>
+<%= link_to 'Destroy', question, method: :delete , :remote => true, :class => 'delete_pony' %>
+<% end %>
+
+
+
+
+
+<div class="answerForm">
+<%= form_for @answer, remote: true do |f| %>
+
+<%= f.text_area :content %>  <br>
+<input type="hidden" name="questionId" value="<%= question.id %>">
+<%= f.submit  %>
+<% end %>
+</div>
+
+
+
+<br>
+
+
+
+<% particulars=@answers.where(:question_id => question.id) %>
+<button class="accordion">Answers</button>
+<div class="panel">
+<% particulars.each do |answer| %>
+<%= answer.User.email %>
+answered
+<%= answer.content %>
+<%= link_to answer.upVoted_string(current_user.id), url_for(controller: 'upvote_answers', action: 'toggle_upvote', answer_id: answer.id),id: "upvoteAnswer_#{answer.id}", method: :post,:remote => true%>
+<br>
+
+<% end %>
+</div>
+</div>
+	<% end %>
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<div id ="rightMain">
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</main>
+
+
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].onclick = function(){
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    }
+}
+</script>
+</body>
+</html>
